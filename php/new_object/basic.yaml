@@ -1,0 +1,33 @@
+rules:
+  - id: new_object
+    severity: ERROR
+    message: >-
+      new object leads to RCE
+    metadata:
+      technology:
+      - php
+      category: security
+      subcategory:
+      - vuln
+    languages: [php]
+    mode: taint
+    pattern-sources:
+      - patterns:
+        - pattern-either:
+            - pattern: $_REQUEST
+            - pattern: $_GET
+            - pattern: $_POST
+            - pattern: $_FILES
+            - pattern: $_COOKIE
+
+    pattern-sinks:
+      - pattern-either:
+        - pattern: new $FUNC()
+        - pattern: new $FUNC($ARG1)
+        - pattern: new $FUNC($ARG1,$ARG2)
+        - pattern: new $FUNC($ARG1,$ARG2,$ARG3)
+        - pattern: new $FUNC($ARG1,$ARG2,$ARG3,$ARG4)
+        - pattern: new $FUNC($ARG1,$ARG2,$ARG3,$ARG4,$ARG5)
+        - pattern: new $FUNC($ARG1,$ARG2,$ARG3,$ARG4,$ARG5,$ARG6)
+
+

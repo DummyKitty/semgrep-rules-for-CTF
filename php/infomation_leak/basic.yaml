@@ -1,0 +1,28 @@
+rules:
+- id: infomation_leak
+  severity: ERROR
+  message: >-
+    infomation leak
+  metadata:
+    technology:
+    - php
+    category: security
+    subcategory:
+    - vuln
+  languages: [php]
+  mode: taint
+  pattern-sources:
+    - patterns:
+        - pattern-either:
+            - pattern: $_REQUEST
+            - pattern: $_GET
+            - pattern: $_POST
+            - pattern: $_FILES
+            - pattern: $_COOKIE
+
+  pattern-sinks:
+    - patterns:
+        - pattern-either:
+            - pattern: phpinfo(...)
+            
+

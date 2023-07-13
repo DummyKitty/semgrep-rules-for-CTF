@@ -1,0 +1,30 @@
+rules:
+- id: weaktype_comparison
+  patterns:
+  - patterns:
+    - pattern-either:
+      - pattern: $X == $FUNC(...)
+      - pattern: $FUNC(...) == $X
+      - pattern: $FUNC(...) == $FUNC(...)
+    - metavariable-regex:
+        metavariable: $FUNC
+        regex: md5|md5_file|sha1
+
+  - pattern: is_numeric($STR)
+  - patterns:
+    - pattern: in_array($NEEDLE,$ARRAY)
+
+
+  message: >-
+    weak type comparison
+  metadata:
+    category: security
+    technology:
+    - php
+    subcategory:
+    - audit
+    likelihood: LOW
+    impact: HIGH
+    confidence: LOW
+  languages: [php]
+  severity: ERROR

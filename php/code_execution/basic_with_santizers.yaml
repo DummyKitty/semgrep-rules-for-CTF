@@ -1,0 +1,66 @@
+rules:
+- id: code_execution
+  severity: ERROR
+  message: >-
+    code execution and command execution with santizers.
+  metadata:
+    technology:
+    - php
+    category: security
+    subcategory:
+    - vuln
+  languages: [php]
+  mode: taint
+  pattern-sources:
+    - patterns:
+        - pattern-either:
+            - pattern: $_REQUEST
+            - pattern: $_GET
+            - pattern: $_POST
+            - pattern: $_FILES
+            - pattern: $_COOKIE
+
+  pattern-sanitizers:
+    - pattern: escapeshellarg(...)
+
+  pattern-sinks:
+    - patterns:
+        - pattern-either:
+            - pattern: eval(...)
+            - pattern: assert(...)
+            - patterns:
+                - pattern: create_function($ARGS, $COMMAND)
+                - focus-metavariable: $COMMAND
+            - patterns:
+                - pattern: preg_replace($REPLACE, $CODE, ...);
+                - metavariable-regex:
+                    metavariable: $REPLACE
+                    regex: ('|")/.*/e('|")
+                - focus-metavariable: $CODE
+            - patterns:
+                - pattern-either:
+                    - pattern-inside: |
+                        $FUNC = new ReflectionFunction($FUNC_NAME);
+                        ...
+                        $FUNC->invoke(...);
+                    - pattern-inside: |
+                        $FUNC = new ReflectionFunction($FUNC_NAME);
+                        ...
+                        $FUNC->invokeArgs(...);
+                - pattern: $FUNC_NAME
+
+            - pattern: array_map(...)
+            - pattern: call_user_func(...)
+            - pattern: call_user_func_array(...)
+            - pattern: array_filter(...)
+            - pattern: usort(...)
+            - pattern: uasort(...)
+            - pattern: system(...)
+            - pattern: exec(...)
+            - pattern: shell_exec(...)
+            - pattern: passthru(...)
+            - pattern: popen(...)
+            - pattern: proc_open(...)
+            - pattern: phpinfo(...)
+            
+
